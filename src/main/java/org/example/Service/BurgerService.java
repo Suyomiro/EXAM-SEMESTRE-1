@@ -1,7 +1,7 @@
 package org.example.Service;
 
-import Repository.BurgerRepository;
-import Entity.Burger;
+import org.example.Repository.BurgerRepository;
+import org.example.Entity.Burger;
 import java.sql.SQLException;
 import java.util.List;
 
