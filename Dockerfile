@@ -20,5 +20,5 @@ COPY --from=build /app/out .
 EXPOSE 80
 
 # Lance l'application
-ENTRYPOINT ["dotnet", "\"Brasil Burger Client.dll\""]
+ENTRYPOINT ["dotnet", "Brasil Burger Client.dll"]
 
