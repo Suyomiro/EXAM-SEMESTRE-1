@@ -1,50 +1,67 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Brasil_Burger_Client</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Brasil Burger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Brasil_Burger_Client.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Brasil_Burger_Client</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+<body class="bg-[#0b0b0f] text-white min-h-screen">
+    <div class="min-h-screen flex flex-col">
+        <header class="sticky top-0 z-50 bg-[#0f0f16]/80 backdrop-blur border-b border-white/5">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                <a asp-controller="Catalog" asp-action="Index" class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
+                        🍔
+                    </div>
+                    <div>
+                        <p class="text-sm text-white/60">Bienvenue chez</p>
+                        <h1 class="text-xl font-semibold">Brasil Burger</h1>
+                    </div>
+                </a>
+                @using Brasil_Burger_Client.Services
+                @{
+                    var clientId = Context.Session.GetInt32(SessionKeys.ClientId);
+                }
+                <nav class="flex items-center gap-2 text-sm">
+                    <a class="px-4 py-2 rounded-xl hover:bg-white/5 transition" asp-controller="Catalog" asp-action="Index">Catalogue</a>
+                    <a class="px-4 py-2 rounded-xl hover:bg-white/5 transition" asp-controller="Cart" asp-action="Index">Panier</a>
+                    <a class="px-4 py-2 rounded-xl hover:bg-white/5 transition" asp-controller="Orders" asp-action="Index">Mes commandes</a>
+                    @if (clientId is int)
+                    {
+                        <form asp-controller="Auth" asp-action="Logout" method="post" class="inline">
+                            <button type="submit" class="px-4 py-2 rounded-xl hover:bg-white/5 transition">Déconnexion</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a class="px-4 py-2 rounded-xl hover:bg-white/5 transition" asp-controller="Auth" asp-action="Login">Compte</a>
+                    }
+                </nav>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+        </header>
+
+        <main class="flex-1">
+            @if (TempData["Error"] is string errorMessage)
+            {
+                <div class="max-w-2xl mx-auto mt-4 px-4">
+                    <div class="bg-red-500/20 border border-red-500/60 text-red-100 text-sm rounded-2xl px-4 py-3">
+                        @errorMessage
+                    </div>
+                </div>
+            }
             @RenderBody()
         </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Brasil_Burger_Client - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+        <footer class="border-t border-white/5 bg-[#0f0f16] py-6 mt-12">
+            <div class="max-w-7xl mx-auto px-4 text-sm text-white/60 flex justify-between">
+                <span>© 2025 Brasil Burger</span>
+                <span>Bon appétit !</span>
+            </div>
+        </footer>
+    </div>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,79 @@
+@model List<Brasil_Burger_Client.Models.ViewModels.CartItemViewModel>
+@{
+    ViewData["Title"] = "Panier";
+    var total = Model.Sum(i => i.Price * i.Quantity);
+}
+
+<div class="max-w-6xl mx-auto px-4 py-10 space-y-6">
+    <div class="flex items-center gap-3">
+        <a asp-controller="Catalog" asp-action="Index" class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-white/30 transition">← Retour au catalogue</a>
+        <h1 class="text-2xl font-semibold">Mon panier</h1>
+        <span class="px-3 py-1 rounded-full bg-white/10 text-sm">@Model.Count article(s)</span>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-20 text-white/70">
+            <div class="text-5xl mb-4">🛒</div>
+            <p>Votre panier est vide.</p>
+            <a asp-controller="Catalog" asp-action="Index" class="mt-4 inline-block px-5 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 font-semibold hover:opacity-90 transition">Voir le catalogue</a>
+        </div>
+    }
+    else
+    {
+        <div class="grid lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-4">
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var item = Model[i];
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-4 flex gap-4">
+                        <img src="@item.Image" alt="@item.Name" class="w-24 h-24 object-cover rounded-xl" />
+                        <div class="flex-1 space-y-3">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <h3 class="text-lg font-semibold">@item.Name</h3>
+                                    <p class="text-sm text-white/60">@item.Description</p>
+                                </div>
+                                <span class="text-orange-400 font-semibold">@item.Price.ToString("N0") FCFA</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <form method="post" asp-action="Update" class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-2">
+                                    <input type="hidden" name="index" value="@i" />
+                                    <button name="quantity" value="@(item.Quantity - 1)" class="px-3 py-2">-</button>
+                                    <span class="w-8 text-center">@item.Quantity</span>
+                                    <button name="quantity" value="@(item.Quantity + 1)" class="px-3 py-2">+</button>
+                                </form>
+                                <form method="post" asp-action="Remove">
+                                    <input type="hidden" name="index" value="@i" />
+                                    <button class="text-red-400 hover:text-red-200">Retirer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4 h-fit sticky top-24">
+                <h3 class="text-lg font-semibold">Récapitulatif</h3>
+                <div class="flex justify-between text-sm text-white/70">
+                    <span>Sous-total</span>
+                    <span>@total.ToString("N0") FCFA</span>
+                </div>
+                <div class="flex justify-between text-sm text-white/70">
+                    <span>Livraison</span>
+                    <span class="text-orange-400">À définir</span>
+                </div>
+                <div class="border-t border-white/10 pt-3 flex justify-between items-center">
+                    <span class="text-lg">Total</span>
+                    <span class="text-2xl text-orange-400 font-semibold">@total.ToString("N0") FCFA</span>
+                </div>
+                <a asp-controller="Checkout" asp-action="Index" class="block text-center px-4 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 font-semibold hover:opacity-90 transition">Passer la commande</a>
+                <p class="text-xs text-white/60 text-center">Livraison gratuite dès 10 000 FCFA</p>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+
+

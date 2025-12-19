@@ -1,0 +1,149 @@
+@model Brasil_Burger_Client.Models.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Finaliser";
+    var subtotal = Model.Subtotal;
+}
+
+<div class="max-w-4xl mx-auto px-4 py-10 space-y-8">
+    <div class="flex items-center gap-3">
+        <a asp-controller="Cart" asp-action="Index" class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-white/30 transition">← Panier</a>
+        <h1 class="text-2xl font-semibold">Finaliser la commande</h1>
+    </div>
+
+    <form method="post" asp-action="Confirm" class="space-y-6">
+        <div class="grid md:grid-cols-3 gap-4">
+            @foreach (var option in new[] { ("livraison","Livraison","🚚"), ("à-emporter","À emporter","🛍️"), ("sur-place","Sur place","🍽️") })
+            {
+                <label class="order-option p-4 border border-white/10 rounded-2xl bg-white/5 hover:border-orange-400 transition cursor-pointer @(Model.OrderType == option.Item1 ? "border-orange-400 opacity-100" : "opacity-60")">
+                    <input type="radio" name="OrderType" value="@option.Item1" class="hidden" @(Model.OrderType == option.Item1 ? "checked" : "") />
+                    <div class="flex items-center gap-3">
+                        <div class="text-2xl">@option.Item3</div>
+                        <div>
+                            <p class="font-semibold">@option.Item2</p>
+                            <p class="text-sm text-white/60">Choisir ce mode</p>
+                        </div>
+                    </div>
+                </label>
+            }
+        </div>
+
+        <div id="delivery-section" class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4 @(Model.OrderType == "livraison" ? "" : "hidden")">
+            <h3 class="text-lg font-semibold">Livraison</h3>
+            <div class="space-y-3">
+                <label class="block text-sm text-white/70">Adresse complète</label>
+                <input id="address-input" name="Address" value="@Model.Address" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500" required />
+            </div>
+            <div class="space-y-3">
+                <label class="block text-sm text-white/70">Zone</label>
+                <select id="zone-select" name="ZoneId" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                    <option value="">Sélectionnez une zone</option>
+                    @foreach (var z in Model.Zones)
+                    {
+                        <option value="@z.Id">@z.Nom - @z.Prix.ToString("N0") FCFA (@z.Quartiers)</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+            <h3 class="text-lg font-semibold">Paiement</h3>
+            <div class="grid md:grid-cols-3 gap-3">
+                @foreach (var p in new[] { "Wave", "OM", "Espèces" })
+                {
+                    <label class="payment-option p-4 border border-white/10 rounded-2xl bg-white/5 hover:border-orange-400 transition cursor-pointer @(Model.PaymentMethod == p ? "border-orange-400 opacity-100" : "opacity-60")">
+                        <input type="radio" name="PaymentMethod" value="@p" class="hidden" @(Model.PaymentMethod == p ? "checked" : "") />
+                        <div class="text-center space-y-1">
+                            <div class="text-3xl">@(p == "Espèces" ? "💵" : "📱")</div>
+                            <p class="font-semibold">@p</p>
+                        </div>
+                    </label>
+                }
+            </div>
+        </div>
+
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
+            <div class="flex justify-between text-sm text-white/70">
+                <span>Sous-total</span>
+                <span>@subtotal.ToString("N0") FCFA</span>
+            </div>
+            <div class="flex justify-between text-sm text-white/70">
+                <span>Livraison</span>
+                <span class="text-orange-400">Selon zone</span>
+            </div>
+            <div class="border-t border-white/10 pt-3 flex justify-between items-center">
+                <span class="text-lg">Total estimé</span>
+                <span class="text-2xl text-orange-400 font-semibold">
+                    @{
+                        var totalDisplay = Model.Subtotal.ToString("N0");
+                        if (Model.ZoneId.HasValue)
+                        {
+                            var z = Model.Zones.FirstOrDefault(x => x.Id == Model.ZoneId.Value);
+                            var tot = Model.Subtotal + (z?.Prix ?? 0);
+                            totalDisplay = tot.ToString("N0");
+                        }
+                    }
+                    @totalDisplay FCFA
+                </span>
+            </div>
+        </div>
+
+        <button type="submit" class="w-full px-5 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 font-semibold hover:opacity-90 transition">Confirmer la commande</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function updateOrderOptions() {
+            document.querySelectorAll('input[name="OrderType"]').forEach(function (inp) {
+                var lab = inp.closest('label');
+                if (!lab) return;
+                if (inp.checked) {
+                    lab.classList.add('border-orange-400');
+                    lab.classList.remove('opacity-60');
+                    lab.classList.add('opacity-100');
+                } else {
+                    lab.classList.remove('border-orange-400');
+                    lab.classList.remove('opacity-100');
+                    lab.classList.add('opacity-60');
+                }
+            });
+
+            var checked = document.querySelector('input[name="OrderType"]:checked');
+            var delivery = document.getElementById('delivery-section');
+            var address = document.getElementById('address-input');
+            var zone = document.getElementById('zone-select');
+            if (checked && checked.value === 'livraison') {
+                if (delivery) delivery.classList.remove('hidden');
+                if (address) address.disabled = false;
+                if (zone) zone.disabled = false;
+            } else {
+                if (delivery) delivery.classList.add('hidden');
+                if (address) { address.disabled = true; address.value = ''; }
+                if (zone) { zone.disabled = true; zone.selectedIndex = 0; }
+            }
+        }
+
+        function updatePaymentOptions() {
+            document.querySelectorAll('input[name="PaymentMethod"]').forEach(function (inp) {
+                var lab = inp.closest('label');
+                if (!lab) return;
+                if (inp.checked) {
+                    lab.classList.add('border-orange-400');
+                    lab.classList.remove('opacity-60');
+                    lab.classList.add('opacity-100');
+                } else {
+                    lab.classList.remove('border-orange-400');
+                    lab.classList.remove('opacity-100');
+                    lab.classList.add('opacity-60');
+                }
+            });
+        }
+
+        document.querySelectorAll('input[name="OrderType"]').forEach(function (i) { i.addEventListener('change', updateOrderOptions); });
+        document.querySelectorAll('input[name="PaymentMethod"]').forEach(function (i) { i.addEventListener('change', updatePaymentOptions); });
+
+        updateOrderOptions();
+        updatePaymentOptions();
+    });
+</script>
+
