@@ -1,7 +1,8 @@
 # ------------------------------
 # Image de base PHP-FPM
 # ------------------------------
-FROM php:8.3-fpm
+# Remplacez 8.3 par 8.4
+FROM php:8.4-fpm
 
 # ------------------------------
 # Installer les dépendances système
