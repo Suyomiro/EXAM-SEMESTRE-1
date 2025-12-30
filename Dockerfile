@@ -30,6 +30,9 @@ COPY . .
 RUN mkdir -p var/cache var/log \
     && chown -R www-data:www-data var public
 
+# AUTORISER SYMFONY FLEX (OBLIGATOIRE)
+RUN composer config --no-plugins allow-plugins.symfony/flex true
+
 # Installer dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader
 
