@@ -1,4 +1,4 @@
-# PHP 8.2 avec Apache (mod_php, PAS CGI)
+# PHP 8.2 avec Apache (mod_php)
 FROM php:8.2-apache
 
 RUN a2enmod rewrite
@@ -23,9 +23,12 @@ COPY . .
 RUN mkdir -p var/cache var/log \
     && chown -R www-data:www-data var public
 
-RUN composer config --no-plugins allow-plugins.symfony/flex true
-
+# ✅ OBLIGATOIRE POUR COMPOSER DANS DOCKER
+ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV COMPOSER_MEMORY_LIMIT=-1
+
+# ✅ AUTORISER SYMFONY FLEX (CORRECTEMENT)
+RUN composer config allow-plugins.symfony/flex true
 
 RUN composer install \
     --no-dev \
