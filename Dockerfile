@@ -36,7 +36,15 @@ RUN composer install \
     --prefer-dist \
     --no-interaction \
     --no-progress \
-    --optimize-autoloader
+    --optimize-autoloader \
+    --apcu-autoloader
+
+# Définir l'environnement Symfony en production pour cache:clear
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+
+# Pré-créer le cache prod
+RUN php bin/console cache:clear --no-warmup && php bin/console cache:warmup
 
 # Exposer le port PHP-FPM
 EXPOSE 9000
