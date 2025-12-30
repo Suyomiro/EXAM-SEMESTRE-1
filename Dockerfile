@@ -4,7 +4,7 @@ FROM php:8.2-apache
 # Activer rewrite
 RUN a2enmod rewrite
 
-# Installer dépendances système
+# Dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -26,10 +26,11 @@ WORKDIR /var/www/html
 # Copier le projet
 COPY . .
 
-# Permissions Symfony
-RUN chown -R www-data:www-data var
+# Créer dossiers Symfony + permissions
+RUN mkdir -p var/cache var/log \
+    && chown -R www-data:www-data var public
 
-# Installer les dépendances Symfony
+# Installer dépendances Symfony
 RUN composer install --no-dev --optimize-autoloader
 
 # Apache doit pointer vers /public
