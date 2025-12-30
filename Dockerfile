@@ -1,54 +1,76 @@
-# Stage 0 : Base PHP
-FROM php:8.4-fpm AS base
+# ------------------------------
+# Image de base PHP-FPM
+# ------------------------------
+FROM php:8.3-fpm
 
+# ------------------------------
 # Installer les dépendances système
+# ------------------------------
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
-    libzip-dev \
-    libonig-dev \
-    zlib1g-dev \
+    zip \
     libicu-dev \
+    libonig-dev \
     libxml2-dev \
-    && docker-php-ext-install intl pdo_mysql mbstring zip opcache \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-install intl pdo_mysql mbstring xml zip gd \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# ------------------------------
 # Installer Composer
+# ------------------------------
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# ------------------------------
 # Définir le répertoire de travail
+# ------------------------------
 WORKDIR /var/www/html
 
+# ------------------------------
 # Copier le projet
+# ------------------------------
 COPY . .
 
-# Créer les dossiers cache/log et attribuer les permissions
+# ------------------------------
+# Droits sur les dossiers de cache et logs
+# ------------------------------
 RUN mkdir -p var/cache var/log \
     && chown -R www-data:www-data var public
 
-# Autoriser symfony/flex et symfony/runtime pour composer
-RUN composer config --no-plugins allow-plugins.symfony/flex true
-RUN composer config --no-plugins allow-plugins.symfony/runtime true
+# ------------------------------
+# Configuration de l'environnement
+# ------------------------------
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
 
-# Installer les dépendances PHP sans dev (Correction ici avec --no-scripts)
+# ------------------------------
+# Installer les dépendances PHP
+# (Utilise uniquement le composer.json copié)
+# ------------------------------
 RUN composer install \
     --no-dev \
     --prefer-dist \
     --no-interaction \
     --no-progress \
     --optimize-autoloader \
-    --apcu-autoloader \
     --no-scripts
 
-# Définir l'environnement Symfony en production
-ENV APP_ENV=prod
-ENV APP_DEBUG=0
+# ------------------------------
+# Préparer le cache Symfony
+# ------------------------------
+RUN php bin/console cache:clear --no-warmup \
+    && php bin/console cache:warmup
 
-# Pré-créer le cache prod (C'est ici que Symfony valide les routes et bundles)
-RUN php bin/console cache:clear --no-warmup && php bin/console cache:warmup
-
-# Exposer le port PHP-FPM
+# ------------------------------
+# Exposer le port FPM
+# ------------------------------
 EXPOSE 9000
 
-# Commande par défaut pour PHP-FPM
+# ------------------------------
+# Commande par défaut
+# ------------------------------
 CMD ["php-fpm"]
