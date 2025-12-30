@@ -50,7 +50,10 @@
             "symfony/runtime": true
         },
         "bump-after-update": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "8.4.0"
+        }
     },
     "autoload": {
         "psr-4": {
@@ -104,12 +107,5 @@
         "symfony/maker-bundle": "^1.0",
         "symfony/stopwatch": "8.0.*",
         "symfony/web-profiler-bundle": "8.0.*"
-    },
-
-    "config": {
-        "platform": {
-            "php": "8.4.0"
-        }
     }
-
 }
