@@ -1,10 +1,8 @@
 # PHP 8.2 avec Apache (mod_php, PAS CGI)
 FROM php:8.2-apache
 
-# Activer rewrite
 RUN a2enmod rewrite
 
-# Dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -17,32 +15,29 @@ RUN apt-get update && apt-get install -y \
     pdo_mysql \
     zip
 
-# Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Dossier de travail
 WORKDIR /var/www/html
-
-# Copier le projet
 COPY . .
 
-# Créer dossiers Symfony + permissions
 RUN mkdir -p var/cache var/log \
     && chown -R www-data:www-data var public
 
-# AUTORISER SYMFONY FLEX (OBLIGATOIRE)
 RUN composer config --no-plugins allow-plugins.symfony/flex true
 
-# Installer dépendances Symfony
-RUN composer install --no-dev --optimize-autoloader
+ENV COMPOSER_MEMORY_LIMIT=-1
 
-# Apache doit pointer vers /public
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --no-interaction \
+    --no-progress \
+    --optimize-autoloader
+
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' \
     /etc/apache2/sites-available/000-default.conf
 
-# IMPORTANT : forcer Apache + mod_php (PAS CGI)
 RUN rm -f /etc/apache2/conf-enabled/php*.conf
 
 EXPOSE 80
-
 CMD ["apache2-foreground"]
