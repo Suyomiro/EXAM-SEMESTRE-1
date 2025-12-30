@@ -30,20 +30,21 @@ RUN mkdir -p var/cache var/log \
 RUN composer config --no-plugins allow-plugins.symfony/flex true
 RUN composer config --no-plugins allow-plugins.symfony/runtime true
 
-# Installer les dépendances PHP sans dev, optimisé pour production
+# Installer les dépendances PHP sans dev (Correction ici avec --no-scripts)
 RUN composer install \
     --no-dev \
     --prefer-dist \
     --no-interaction \
     --no-progress \
     --optimize-autoloader \
-    --apcu-autoloader
+    --apcu-autoloader \
+    --no-scripts
 
 # Définir l'environnement Symfony en production
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
-# Pré-créer le cache prod
+# Pré-créer le cache prod (C'est ici que Symfony valide les routes et bundles)
 RUN php bin/console cache:clear --no-warmup && php bin/console cache:warmup
 
 # Exposer le port PHP-FPM

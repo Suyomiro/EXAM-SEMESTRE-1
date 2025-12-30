@@ -10,7 +10,7 @@ return [
     Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => true],
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
-    Symfony\Bundle\MailerBundle\MailerBundle::class => ['all' => true],
+    // La ligne MailerBundle a été supprimée ici car elle causait l'erreur 255
     Symfony\Bundle\WebLinkBundle\WebLinkBundle::class => ['all' => true],
     Symfony\Bundle\AssetMapperBundle\AssetMapperBundle::class => ['all' => true],
     Symfony\Bundle\DotenvBundle\DotenvBundle::class => ['all' => true],
