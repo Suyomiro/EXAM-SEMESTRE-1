@@ -30,7 +30,7 @@ RUN mkdir -p var/cache var/log \
 RUN composer config --no-plugins allow-plugins.symfony/flex true
 RUN composer config --no-plugins allow-plugins.symfony/runtime true
 
-# Installer les dépendances PHP
+# Installer les dépendances PHP sans dev, optimisé pour production
 RUN composer install \
     --no-dev \
     --prefer-dist \
@@ -39,7 +39,7 @@ RUN composer install \
     --optimize-autoloader \
     --apcu-autoloader
 
-# Définir l'environnement Symfony pour production
+# Définir l'environnement Symfony en production
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
@@ -49,5 +49,5 @@ RUN php bin/console cache:clear --no-warmup && php bin/console cache:warmup
 # Exposer le port PHP-FPM
 EXPOSE 9000
 
-# Commande par défaut
+# Commande par défaut pour PHP-FPM
 CMD ["php-fpm"]

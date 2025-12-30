@@ -1,7 +1,6 @@
 <?php
 
 return [
-    // Bundles pour tous les environnements
     Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
     Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class => ['all' => true],
     Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle::class => ['all' => true],
@@ -11,13 +10,12 @@ return [
     Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => true],
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
-    Symfony\UX\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
     Symfony\Bundle\MailerBundle\MailerBundle::class => ['all' => true],
     Symfony\Bundle\WebLinkBundle\WebLinkBundle::class => ['all' => true],
     Symfony\Bundle\AssetMapperBundle\AssetMapperBundle::class => ['all' => true],
     Symfony\Bundle\DotenvBundle\DotenvBundle::class => ['all' => true],
 
-    // Bundles pour dev et test uniquement
+    // Dev / Test seulement
     Symfony\Bundle\DebugBundle\DebugBundle::class => ['dev' => true, 'test' => true],
     Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true],
