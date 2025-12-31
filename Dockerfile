@@ -1,8 +1,18 @@
 # ------------------------------
-# Image de base PHP-FPM
+# Image de base : PHP 8.4 avec Apache
 # ------------------------------
-# Remplacez 8.3 par 8.4
-FROM php:8.4-fpm
+FROM php:8.4-apache
+
+# ------------------------------
+# Configuration d'Apache pour Symfony
+# ------------------------------
+# On change le DocumentRoot vers le dossier /public de Symfony
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Activer le module Rewrite d'Apache (nécessaire pour Symfony)
+RUN a2enmod rewrite
 
 # ------------------------------
 # Installer les dépendances système
@@ -18,6 +28,7 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install intl pdo_mysql mbstring xml zip gd \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -34,13 +45,8 @@ WORKDIR /var/www/html
 # ------------------------------
 # Copier le projet
 # ------------------------------
+# On copie tout le projet dans le conteneur
 COPY . .
-
-# ------------------------------
-# Droits sur les dossiers de cache et logs
-# ------------------------------
-RUN mkdir -p var/cache var/log \
-    && chown -R www-data:www-data var public
 
 # ------------------------------
 # Configuration de l'environnement
@@ -50,7 +56,6 @@ ENV APP_DEBUG=0
 
 # ------------------------------
 # Installer les dépendances PHP
-# (Utilise uniquement le composer.json copié)
 # ------------------------------
 RUN composer install \
     --no-dev \
@@ -61,17 +66,16 @@ RUN composer install \
     --no-scripts
 
 # ------------------------------
-# Préparer le cache Symfony
+# Droits et Cache Symfony
 # ------------------------------
-RUN php bin/console cache:clear --no-warmup \
+RUN mkdir -p var/cache var/log \
+    && chown -R www-data:www-data var public \
+    && php bin/console cache:clear --no-warmup \
     && php bin/console cache:warmup
 
 # ------------------------------
-# Exposer le port FPM
+# Exposer le port HTTP (Render détectera ce port)
 # ------------------------------
-EXPOSE 9000
+EXPOSE 80
 
-# ------------------------------
-# Commande par défaut
-# ------------------------------
-CMD ["php-fpm"]
+# Apache démarre automatiquement via l'image de base
