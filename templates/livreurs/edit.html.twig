@@ -1,0 +1,37 @@
+{% extends 'manager/layout.html.twig' %}
+
+{% block title %}Modifier livreur - Brasil Burger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-semibold">Modifier le livreur</h1>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-xl p-6">
+        <form method="post" action="{{ path('livreurs_edit', {id: livreur.id}) }}" class="space-y-4">
+            <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nom</label>
+                    <input type="text" name="nom" required value="{{ livreur.nom }}"
+                           class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Prénom</label>
+                    <input type="text" name="prenom" required value="{{ livreur.prenom }}"
+                           class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Téléphone</label>
+                    <input type="text" name="telephone" required value="{{ livreur.telephone }}"
+                           class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="submit" class="inline-flex items-center px-4 py-2 rounded-lg bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600">Enregistrer</button>
+                <a href="{{ path('livreurs_index') }}" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
