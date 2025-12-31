@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion gestionnaire - Brasil Burger{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-gradient-to-br from-emerald-100 via-slate-50 to-emerald-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-500 rounded-2xl mb-4">
+                <span class="text-4xl text-white">🛡️</span>
+            </div>
+            <h1 class="text-2xl font-semibold text-emerald-600 mb-2">Espace Gestionnaire</h1>
+            <p class="text-slate-500">Brasil Burger - Administration</p>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl space-y-4">
+            {% if error %}
+                <div class="p-3 rounded-lg bg-red-50 text-sm text-red-700">
+                    {{ error }}
+                </div>
+            {% endif %}
+            <form method="post" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Email administrateur</label>
+                    <input type="email" name="email" required
+                           placeholder="manager@brasilburger.com"
+                           class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Mot de passe</label>
+                    <input type="password" name="password" required
+                           placeholder="••••••••"
+                           class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <button type="submit"
+                        class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition">
+                    <span>Se connecter</span>
+                </button>
+            </form>
+
+            <div class="mt-4 p-3 bg-emerald-50 rounded-lg text-sm text-emerald-800">
+                Compte de test : <span class="font-mono">manager@brasilburger.com</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
