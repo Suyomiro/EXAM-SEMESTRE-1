@@ -1,0 +1,271 @@
+{% extends 'manager/layout.html.twig' %}
+
+{% block title %}Gestion des produits - Brasil Burger{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-semibold mb-2">Gestion des produits</h1>
+            <p class="text-slate-500">Gérer les burgers, menus et compléments</p>
+        </div>
+        <form method="get" action="{{ path('products_index') }}" class="hidden">
+            {# bouton pour un éventuel modal côté JS #}
+        </form>
+    </div>
+
+    <form method="get" action="{{ path('products_index') }}" class="relative max-w-md">
+        <input
+            type="text"
+            name="q"
+            placeholder="Rechercher un produit..."
+            value="{{ search }}"
+            class="w-full pl-3 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        />
+        <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            {% if search is not empty %}
+                <a href="{{ path('products_index') }}" class="text-sm text-slate-500 px-2 py-1 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">Réinitialiser</a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="border-b border-slate-200 flex gap-2">
+        <button type="button" data-tab="all" class="tab-btn px-6 py-3 border-b-2 border-transparent text-slate-500 text-sm font-medium">
+            📚 Tous ({{ burgers|length + menus|length + complements|length }})
+        </button>
+        <button type="button" data-tab="burgers" class="tab-btn px-6 py-3 border-b-2 border-emerald-500 text-emerald-600 text-sm font-medium">
+            🍔 Burgers ({{ burgers|length }})
+        </button>
+        <button type="button" data-tab="menus" class="tab-btn px-6 py-3 border-b-2 border-transparent text-slate-500 text-sm font-medium">
+            🍱 Menus ({{ menus|length }})
+        </button>
+        <button type="button" data-tab="complements" class="tab-btn px-6 py-3 border-b-2 border-transparent text-slate-500 text-sm font-medium">
+            🍟 Compléments ({{ complements|length }})
+        </button>
+    </div>
+
+    <div class="grid gap-4">
+        <div id="tab-all" class="tab-content hidden">
+            {% if burgers is not empty %}
+                <h3 class="text-sm font-medium text-slate-600 mb-2">🍔 Burgers</h3>
+                {% for burger in burgers %}
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 hover:shadow-lg transition-all mb-2">
+                        {% if burger.image %}
+                            <img src="{{ burger.image }}" alt="{{ burger.name }}" class="w-20 h-20 rounded-lg object-cover">
+                        {% else %}
+                            <img src="{{ asset('images/product-default.png') }}" alt="{{ burger.name }}" class="w-20 h-20 rounded-lg object-cover">
+                        {% endif %}
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-semibold mb-1">{{ burger.name }}</h3>
+                                    <p class="text-sm text-slate-500">{{ burger.description }}</p>
+                                </div>
+                                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 capitalize">
+                                    {{ burger.category }}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-emerald-600 font-semibold">{{ burger.price|number_format(0, '', ' ') }} FCFA</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if menus is not empty %}
+                <h3 class="text-sm font-medium text-slate-600 my-3">🍱 Menus</h3>
+                {% for menu in menus %}
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 hover:shadow-lg transition-all mb-2">
+                        {% if menu.image %}
+                            <img src="{{ menu.image }}" alt="{{ menu.name }}" class="w-20 h-20 rounded-lg object-cover">
+                        {% else %}
+                            <img src="{{ asset('images/product-default.png') }}" alt="{{ menu.name }}" class="w-20 h-20 rounded-lg object-cover">
+                        {% endif %}
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-semibold mb-1">{{ menu.name }}</h3>
+                                    <p class="text-sm text-slate-500">{{ menu.description }}</p>
+                                </div>
+                                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-700">Menu</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-emerald-600 font-semibold">{{ menu.price|number_format(0, '', ' ') }} FCFA</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if complements is not empty %}
+                <h3 class="text-sm font-medium text-slate-600 my-3">🍟 Compléments</h3>
+                {% for complement in complements %}
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 hover:shadow-lg transition-all mb-2">
+                        {% if complement.image %}
+                            <img src="{{ complement.image }}" alt="{{ complement.name }}" class="w-20 h-20 rounded-lg object-cover">
+                        {% else %}
+                            <img src="{{ asset('images/product-default.png') }}" alt="{{ complement.name }}" class="w-20 h-20 rounded-lg object-cover">
+                        {% endif %}
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h3 class="font-semibold mb-1">{{ complement.name }}</h3>
+                                    <p class="text-sm text-slate-500">{{ complement.description|default('') }}</p>
+                                </div>
+                                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-700">Complément</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="text-emerald-600 font-semibold">{{ complement.price|default(0)|number_format(0, '', ' ') }} FCFA</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div id="tab-burgers" class="tab-content">
+        {% for burger in burgers %}
+            <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 hover:shadow-lg transition-all">
+                {% if burger.image %}
+                    <img src="{{ burger.image }}" alt="{{ burger.name }}" class="w-20 h-20 rounded-lg object-cover">
+                {% else %}
+                    <img src="{{ asset('images/product-default.png') }}" alt="{{ burger.name }}" class="w-20 h-20 rounded-lg object-cover">
+                {% endif %}
+
+                <div class="flex-1">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <h3 class="font-semibold mb-1">{{ burger.name }}</h3>
+                            <p class="text-sm text-slate-500">{{ burger.description }}</p>
+                        </div>
+                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 capitalize">
+                            {{ burger.category }}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <span class="text-emerald-600 font-semibold">{{ burger.price|number_format(0, '', ' ') }} FCFA</span>
+                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium {{ burger.available ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
+                            {{ burger.available ? 'Disponible' : 'Indisponible' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    {# Edition simple via POST vers la même page (peut être remplacé par un modal JS) #}
+                    <form method="post" action="{{ path('products_burger_archive', {id: burger.id}) }}">
+                        <button
+                            type="submit"
+                            class="px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 border border-transparent"
+                        >
+                            Archiver
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center text-slate-500 py-10">Aucun burger trouvé.</p>
+        {% endfor %}
+        </div>
+
+        <div id="tab-menus" class="tab-content hidden">
+            {% for menu in menus %}
+                <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 hover:shadow-lg transition-all">
+                    {% if menu.image %}
+                        <img src="{{ menu.image }}" alt="{{ menu.name }}" class="w-20 h-20 rounded-lg object-cover">
+                    {% else %}
+                        <img src="{{ asset('images/product-default.png') }}" alt="{{ menu.name }}" class="w-20 h-20 rounded-lg object-cover">
+                    {% endif %}
+
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h3 class="font-semibold mb-1">{{ menu.name }}</h3>
+                                <p class="text-sm text-slate-500">{{ menu.description }}</p>
+                            </div>
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 capitalize">
+                                Menu
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <span class="text-emerald-600 font-semibold">{{ menu.price|default(0)|number_format(0, '', ' ') }} FCFA</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <a href="#" class="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 border border-transparent">Voir</a>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center text-slate-500 py-10">Aucun menu trouvé.</p>
+            {% endfor %}
+        </div>
+
+        <div id="tab-complements" class="tab-content hidden">
+            {% for complement in complements %}
+                <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4 hover:shadow-lg transition-all">
+                    {% if complement.image %}
+                        <img src="{{ complement.image }}" alt="{{ complement.name }}" class="w-20 h-20 rounded-lg object-cover">
+                    {% else %}
+                        <img src="{{ asset('images/product-default.png') }}" alt="{{ complement.name }}" class="w-20 h-20 rounded-lg object-cover">
+                    {% endif %}
+
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between mb-2">
+                            <div>
+                                <h3 class="font-semibold mb-1">{{ complement.name }}</h3>
+                                <p class="text-sm text-slate-500">{{ complement.description|default('') }}</p>
+                            </div>
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 capitalize">
+                                Complément
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <span class="text-emerald-600 font-semibold">{{ complement.price|default(0)|number_format(0, '', ' ') }} FCFA</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <a href="#" class="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 border border-transparent">Voir</a>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center text-slate-500 py-10">Aucun complément trouvé.</p>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+
+    function activate(tabName) {
+        contents.forEach(c => c.classList.toggle('hidden', c.id !== 'tab-' + tabName));
+        tabs.forEach(b => {
+            if (b.dataset.tab === tabName) {
+                b.classList.remove('border-transparent','text-slate-500');
+                b.classList.add('border-emerald-500','text-emerald-600');
+            } else {
+                b.classList.remove('border-emerald-500','text-emerald-600');
+                b.classList.add('border-transparent','text-slate-500');
+            }
+        });
+    }
+
+    tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.tab)));
+
+    // activate default tab: if a search is present, show 'all', else show burgers
+    const defaultTab = {{ (search is not empty ? 'all' : 'burgers')|json_encode|raw }};
+    activate(defaultTab);
+});
+</script>
+</div>
+{% endblock %}
+
+
