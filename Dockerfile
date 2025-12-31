@@ -12,59 +12,45 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
     && a2enmod rewrite
 
 # ------------------------------
-# Installer les dépendances système
+# Dépendances système (PostgreSQL pour Neon + GD pour les images)
 # ------------------------------
 RUN apt-get update && apt-get install -y \
     git unzip zip libicu-dev libonig-dev libxml2-dev libzip-dev \
-    libpng-dev libjpeg-dev libfreetype6-dev \
+    libpng-dev libjpeg-dev libfreetype6-dev libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install intl pdo_mysql mbstring xml zip gd \
+    && docker-php-ext-install intl pdo_pgsql mbstring xml zip gd \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------
-# Installer Composer
+# Installation de Composer
 # ------------------------------
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # ------------------------------
-# Définir le répertoire de travail
+# Préparation du projet
 # ------------------------------
 WORKDIR /var/www/html
-
-# ------------------------------
-# Copier uniquement les fichiers Composer pour optimiser le cache
-# ------------------------------
 COPY composer.json composer.lock ./
 
-# Installer les dépendances PHP (prod)
-RUN composer install \
-    --no-dev \
-    --prefer-dist \
-    --no-interaction \
-    --no-progress \
-    --optimize-autoloader \
-    --no-scripts
+# Installation propre (ignore les limites de version locale)
+RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-req=php
 
-# ------------------------------
-# Copier le reste du projet
-# ------------------------------
+# Copie du reste du code
 COPY . .
 
 # ------------------------------
-# Configuration de l'environnement
+# Configuration Symfony & Permissions
 # ------------------------------
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 
-# ------------------------------
-# Droits et Cache Symfony
-# ------------------------------
 RUN mkdir -p var/cache var/log \
-    && chown -R www-data:www-data var public vendor config
+    && chown -R www-data:www-data var public vendor config \
+    && chmod -R 775 var/cache var/log
 
-# ------------------------------
-# Exposer le port HTTP
+# 1. Générer le cache
+# 2. On essaie de lancer les migrations automatiquement (si DATABASE_URL est prête)
+RUN php bin/console cache:clear --env=prod
+
 # ------------------------------
 EXPOSE 80
-
-# Apache démarre automatiquement via l'image de base
